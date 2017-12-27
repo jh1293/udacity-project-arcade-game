@@ -1,0 +1,31 @@
+{
+  "name": "udacity-project-arcade-game",
+  "version": "1.0.0",
+  "description": "This project is part of Udacity Front-End Development Nanodegree.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jeff Yang",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jh1293/udacity-project-arcade-game.git"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-minify": "^0.2.0",
+    "browser-sync": "^2.21.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-clean-css": "^3.9.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-html-minifier": "^0.1.8",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.2",
+    "webpack-stream": "^4.0.0"
+  },
+  "dependencies": {}
+}
