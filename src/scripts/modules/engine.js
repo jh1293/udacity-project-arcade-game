@@ -7,7 +7,7 @@ export default class Engine {
     this.stamp = 0;
     this.delta = 0;
     this.frames = 0;
-    this.state = 200;
+    this.state = null;
   }
 
   get fps() {
@@ -29,16 +29,14 @@ export default class Engine {
       /**
        * Divide the main loop into two seperated states.
        * With state 100, main loop runs as normal.
-       * With state 200, delta calculation runs as normal, while update and render process were been suspended.
+       * With state null, delta calculation runs as normal, while update and render process were been suspended.
        * This way, main loop can be controlled at will.
        */
-      switch (this.state) {
-        case 100:  // Normal
+      if (this.state === 100) {
           this.frames++;
           this.update(this.delta);
+          this.cleanup();
           this.render();
-        case 200:  // Paused
-          break;
       }
       this.loopID = this.window.requestAnimationFrame(loop.bind(this));
     }
@@ -56,7 +54,7 @@ export default class Engine {
   }
 
   pause() {
-    this.state = 200;
+    this.state = null;
   }
 
   stop() {
