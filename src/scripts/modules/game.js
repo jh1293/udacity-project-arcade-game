@@ -59,11 +59,32 @@ engine.update = function(delta) {
   console.log('engine state: ' + this.state);
   console.log('----------------');
 
+  player.collision = {
+        center: {
+          x: player.pos.x + 50,
+          y: player.pos.y + 100
+        },
+        radius: 36
+      };
   player.update(delta);
 
   enemies.forEach((value) => {
+    value.collision = {
+          center: {
+            x: value.pos.x + 75,
+            y: value.pos.y + 100
+          },
+          radius: 20
+        };
     value.update(delta);
   });
+
+
+
+  if (engine.collisionCheck(player, ...enemies).isCollided) {
+    engine.pause();
+  } else {
+  };
 };
 
 /**
@@ -85,7 +106,6 @@ engine.render = function() {
   enemies.forEach((value) => {
     value.render(engine.ctx);
   });
-
   player.render(engine.ctx);
 };
 
@@ -102,4 +122,4 @@ document.addEventListener('keydown', (event) => {
   event.preventDefault();
 });
 
-// setTimeout(() => {engine.pause()}, 1200);
+setTimeout(() => {engine.pause()}, 4000);

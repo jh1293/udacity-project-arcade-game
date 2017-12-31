@@ -9,6 +9,13 @@ class Actor {
       y: 0
     };
     this.spriterImage = null;
+    this.collision = {
+      center: {
+        x: 0,
+        y: 0
+      },
+      radius: 0
+    };
   }
 
   get width() {
@@ -25,10 +32,6 @@ class Actor {
 
   set spriter(resURL) {
     this.spriterImage = resources.load(resURL);
-  }
-
-  update(delta) {
-
   }
 
   render(context) {
@@ -48,17 +51,18 @@ class Player extends Actor {
   }
 
   update(delta) {
-    if (this.pos.x <= 0) {
-      this.dest.x = 1;
+    // '10' at the end of each expression is a tolerance value.
+    if (this.dest.x < 0 - 10) {
+      this.dest.x = this.pos.x;
     }
-    if (this.pos.x >= 502 - this.width) {
-      this.dest.x = 502 - this.width - 1;
+    if (this.dest.x > 502 - this.width + 10) {
+      this.dest.x = this.pos.x;
     }
-    if (this.pos.y <= (-31)) {
-      this.dest.y = (-30);
+    if (this.dest.y < (-30) - 10) {
+      this.dest.y = this.pos.y;
     }
-    if (this.pos.y >= 652 - this.height) {
-      this.dest.y = 652 - this.height - 30;
+    if (this.dest.y > 652 - this.height + 10) {
+      this.dest.y = this.pos.y;
     }
     this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
     this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;

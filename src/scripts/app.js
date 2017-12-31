@@ -155,6 +155,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     setTimeout(() => {this.state = 100}, 1000);
   }
 
+  collisionCheck(subject, ...object) {
+    let dx, dy, distance, diff_radius, isCollided;
+    object.forEach((value) => {
+      dx = subject.collision.center.x - value.collision.center.x;
+      dy = subject.collision.center.y - value.collision.center.y;
+      distance = Math.sqrt(dx * dx + dy * dy);
+      diff_radius = subject.collision.radius + value.collision.radius;
+      if (Number(distance) < Number(diff_radius)) {
+        isCollided = true;
+      }
+    });
+    return {isCollided: isCollided};
+  }
+
   resume() {
     this.state = 100;
   }
@@ -193,6 +207,13 @@ class Actor {
       y: 0
     };
     this.spriterImage = null;
+    this.collision = {
+      center: {
+        x: 0,
+        y: 0
+      },
+      radius: 0
+    };
   }
 
   get width() {
@@ -209,10 +230,6 @@ class Actor {
 
   set spriter(resURL) {
     this.spriterImage = resources.load(resURL);
-  }
-
-  update(delta) {
-
   }
 
   render(context) {
@@ -232,17 +249,18 @@ class Player extends Actor {
   }
 
   update(delta) {
-    if (this.pos.x <= 0) {
-      this.dest.x = 1;
+    // '10' at the end of each expression is a tolerance value.
+    if (this.dest.x < 0 - 10) {
+      this.dest.x = this.pos.x;
     }
-    if (this.pos.x >= 502 - this.width) {
-      this.dest.x = 502 - this.width - 1;
+    if (this.dest.x > 502 - this.width + 10) {
+      this.dest.x = this.pos.x;
     }
-    if (this.pos.y <= (-31)) {
-      this.dest.y = (-30);
+    if (this.dest.y < (-30) - 10) {
+      this.dest.y = this.pos.y;
     }
-    if (this.pos.y >= 652 - this.height) {
-      this.dest.y = 652 - this.height - 30;
+    if (this.dest.y > 652 - this.height + 10) {
+      this.dest.y = this.pos.y;
     }
     this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
     this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;
@@ -490,11 +508,32 @@ engine.update = function(delta) {
   console.log('engine state: ' + this.state);
   console.log('----------------');
 
+  player.collision = {
+        center: {
+          x: player.pos.x + 50,
+          y: player.pos.y + 100
+        },
+        radius: 36
+      };
   player.update(delta);
 
   enemies.forEach((value) => {
+    value.collision = {
+          center: {
+            x: value.pos.x + 75,
+            y: value.pos.y + 100
+          },
+          radius: 20
+        };
     value.update(delta);
   });
+
+
+
+  if (engine.collisionCheck(player, ...enemies).isCollided) {
+    engine.pause();
+  } else {
+  };
 };
 
 /**
@@ -516,7 +555,6 @@ engine.render = function() {
   enemies.forEach((value) => {
     value.render(engine.ctx);
   });
-
   player.render(engine.ctx);
 };
 
@@ -533,7 +571,7 @@ document.addEventListener('keydown', (event) => {
   event.preventDefault();
 });
 
-// setTimeout(() => {engine.pause()}, 1200);
+setTimeout(() => {engine.pause()}, 4000);
 
 
 /***/ })

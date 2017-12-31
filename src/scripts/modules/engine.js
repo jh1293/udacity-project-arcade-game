@@ -49,6 +49,20 @@ export default class Engine {
     setTimeout(() => {this.state = 100}, 1000);
   }
 
+  collisionCheck(subject, ...object) {
+    let dx, dy, distance, diff_radius, isCollided;
+    object.forEach((value) => {
+      dx = subject.collision.center.x - value.collision.center.x;
+      dy = subject.collision.center.y - value.collision.center.y;
+      distance = Math.sqrt(dx * dx + dy * dy);
+      diff_radius = subject.collision.radius + value.collision.radius;
+      if (Number(distance) < Number(diff_radius)) {
+        isCollided = true;
+      }
+    });
+    return {isCollided: isCollided};
+  }
+
   resume() {
     this.state = 100;
   }
