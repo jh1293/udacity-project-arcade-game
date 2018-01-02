@@ -59,11 +59,11 @@ export default class Engine {
       diff_radius = subject.collision.radius + value.collision.radius;
       if (Number(distance) < Number(diff_radius)) {
         isCollided = true;
-        window.shared.events.game = 'lose';
-        // this.pause();
+        let event = new CustomEvent('break', {detail: 'collide'});
+        document.dispatchEvent(event);
       }
     });
-    return {isCollided: isCollided};
+    // return {isCollided: isCollided};
   }
 
   resume() {

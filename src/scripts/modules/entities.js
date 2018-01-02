@@ -52,30 +52,6 @@ class Player extends Actor {
 
   update(delta) {
 
-
-
-    // Handle input event
-    if (this.isMoving != true) {
-      switch (window.shared.events.key) {
-        case "ArrowUp":
-          this.dest.y = this.pos.y - 80;
-          break;
-        case "ArrowDown":
-          this.dest.y = this.pos.y + 80;
-          break;
-        case "ArrowLeft":
-          this.dest.x = this.pos.x - 100;
-          break;
-        case "ArrowRight":
-          this.dest.x = this.pos.x + 100;
-          break;
-      }
-      window.shared.events.key = null;
-      this.isMoving = true;
-      setTimeout(() => {this.isMoving = false;}, this.interval * 4000);
-    }
-
-
     // Moveable area restriction
     // '10' at the end of each expression is a tolerance value.
     if (this.dest.x < 0 - 10) {
@@ -95,7 +71,8 @@ class Player extends Actor {
 
     // Condition to win
     if (this.pos.y < -28) {
-      window.shared.events.game = 'win';
+      let event = new CustomEvent('break', {detail: 'reach'});
+      document.dispatchEvent(event);
     }
 
     // if (window.shared.events.game === 'lose') {
@@ -103,18 +80,47 @@ class Player extends Actor {
     //   this.pos.y = this.dest.y = 450;
     // }
 
-    if (window.shared.events.game) {
-      this.pos.x = this.dest.x = 200;
-      this.pos.y = this.dest.y = 450;
-    }
+    // if (window.shared.events.game) {
+    //   this.pos.x = this.dest.x = 200;
+    //   this.pos.y = this.dest.y = 450;
+    // }
 
     // Update position
     this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
     this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;
   }
 
-  event() {
-    
+  react(event) {
+    // Handle input event
+    if (this.isMoving != true) {
+      switch (event.key) {
+        case 'ArrowUp':
+          this.dest.y = this.pos.y - 80;
+          break;
+        case 'ArrowDown':
+          this.dest.y = this.pos.y + 80;
+          break;
+        case 'ArrowLeft':
+          this.dest.x = this.pos.x - 100;
+          break;
+        case 'ArrowRight':
+          this.dest.x = this.pos.x + 100;
+          break;
+      }
+      this.isMoving = true;
+      setTimeout(() => {this.isMoving = false;}, this.interval * 4000);
+    }
+
+    switch (event.detail) {
+      case 'collide':
+        this.pos.x = this.dest.x = 200;
+        this.pos.y = this.dest.y = 450;
+        break;
+      case 'reach':
+        this.pos.x = this.dest.x = 200;
+        this.pos.y = this.dest.y = 450;
+        break;
+    }
   }
 }
 

@@ -6,16 +6,6 @@ import { Actor, Player, Enemy } from './entities.js';
 import Map from './map.js';
 
 /**
- * Global variables.
- */
-window.shared = {
-  events: {
-    game: null,
-    key: null
-  }
-};
-
-/**
  * Instantiating area.
  */
 let engine = new Engine();  // Game engine
@@ -66,24 +56,12 @@ engine.init = function() {
 
   map.tileSet = './images/map.json';
 };
-// let blurRadius = 0;
+
 /**
  * The first part of main loop.
  * This function handles math related stuff, such as update entities, collision check.
  */
 engine.update = function(delta) {
-  // blurRadius += 1 * delta;
-  // engine.canvas.style.filter = `blur(${blurRadius}px)`;
-
-  if (window.shared.events.game === 'lose') {
-    sound.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
-    window.shared.events.game = null;
-  }
-
-  if (window.shared.events.game === 'win') {
-    sound.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
-    window.shared.events.game = null;
-  }
 
   console.log('delta: ' + delta);
   console.log('frames: ' + this.frames);
@@ -111,13 +89,7 @@ engine.update = function(delta) {
     value.update(delta);
   });
 
-  if (engine.collisionCheck(player, ...enemies).isCollided) {
-    // engine.pause();
-    player.pos.x = player.dest.x = 200;
-    player.pos.y = player.dest.y = 450;
-  }
-  // engine.collisionCheck(player, ...enemies);
-  // console.log(window.shared.events.game);
+  engine.collisionCheck(player, ...enemies);
 };
 
 /**
@@ -125,7 +97,6 @@ engine.update = function(delta) {
  * Clean up entire canvas before actually drawing this frame.
  */
 engine.cleanup = function() {
-  // engine.ctx.fillStyle = '#fff8e4';
   engine.ctx.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
 };
 
@@ -149,12 +120,15 @@ engine.render = function() {
 engine.run();
 
 /**
- * Handling user input.
+ * Handling events.
  */
 document.addEventListener('keydown', (event) => {
-  // player.events(event.key);
-  window.shared.events.key = event.key
-  event.preventDefault();
+  player.react(event);
+});
+
+document.addEventListener('break', (event) => {
+  player.react(event);
+  sound.react(event);
 });
 
 // setTimeout(() => {engine.pause()}, 4000);

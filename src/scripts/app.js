@@ -103,7 +103,6 @@ class Resources {
         audio.onload = function() {
           thisArg.resPool[resURL] = audio;
         }
-        // console.log(thisArg.resPool);
         return audio;
       }
 
@@ -181,11 +180,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       diff_radius = subject.collision.radius + value.collision.radius;
       if (Number(distance) < Number(diff_radius)) {
         isCollided = true;
-        window.shared.events.game = 'lose';
-        // this.pause();
+        let event = new CustomEvent('break', {detail: 'collide'});
+        document.dispatchEvent(event);
       }
     });
-    return {isCollided: isCollided};
+    // return {isCollided: isCollided};
   }
 
   resume() {
@@ -269,30 +268,6 @@ class Player extends Actor {
 
   update(delta) {
 
-
-
-    // Handle input event
-    if (this.isMoving != true) {
-      switch (window.shared.events.key) {
-        case "ArrowUp":
-          this.dest.y = this.pos.y - 80;
-          break;
-        case "ArrowDown":
-          this.dest.y = this.pos.y + 80;
-          break;
-        case "ArrowLeft":
-          this.dest.x = this.pos.x - 100;
-          break;
-        case "ArrowRight":
-          this.dest.x = this.pos.x + 100;
-          break;
-      }
-      window.shared.events.key = null;
-      this.isMoving = true;
-      setTimeout(() => {this.isMoving = false;}, this.interval * 4000);
-    }
-
-
     // Moveable area restriction
     // '10' at the end of each expression is a tolerance value.
     if (this.dest.x < 0 - 10) {
@@ -312,7 +287,8 @@ class Player extends Actor {
 
     // Condition to win
     if (this.pos.y < -28) {
-      window.shared.events.game = 'win';
+      let event = new CustomEvent('break', {detail: 'reach'});
+      document.dispatchEvent(event);
     }
 
     // if (window.shared.events.game === 'lose') {
@@ -320,16 +296,47 @@ class Player extends Actor {
     //   this.pos.y = this.dest.y = 450;
     // }
 
-    if (window.shared.events.game) {
-      this.pos.x = this.dest.x = 200;
-      this.pos.y = this.dest.y = 450;
-    }
+    // if (window.shared.events.game) {
+    //   this.pos.x = this.dest.x = 200;
+    //   this.pos.y = this.dest.y = 450;
+    // }
 
     // Update position
     this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
     this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;
+  }
 
+  react(event) {
+    // Handle input event
+    if (this.isMoving != true) {
+      switch (event.key) {
+        case 'ArrowUp':
+          this.dest.y = this.pos.y - 80;
+          break;
+        case 'ArrowDown':
+          this.dest.y = this.pos.y + 80;
+          break;
+        case 'ArrowLeft':
+          this.dest.x = this.pos.x - 100;
+          break;
+        case 'ArrowRight':
+          this.dest.x = this.pos.x + 100;
+          break;
+      }
+      this.isMoving = true;
+      setTimeout(() => {this.isMoving = false;}, this.interval * 4000);
+    }
 
+    switch (event.detail) {
+      case 'collide':
+        this.pos.x = this.dest.x = 200;
+        this.pos.y = this.dest.y = 450;
+        break;
+      case 'reach':
+        this.pos.x = this.dest.x = 200;
+        this.pos.y = this.dest.y = 450;
+        break;
+    }
   }
 }
 
@@ -412,6 +419,18 @@ class Sound {
 
   play(audio) {
     this.effectsPool[audio].play();
+  }
+
+  react(event) {
+    switch (event.detail) {
+      case 'collide':
+        this.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
+        break;
+      case 'reach':
+        this.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
+        break;
+    }
+
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["default"] = Sound;
@@ -528,16 +547,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /**
- * Global variables.
- */
-window.shared = {
-  events: {
-    game: null,
-    key: null
-  }
-};
-
-/**
  * Instantiating area.
  */
 let engine = new __WEBPACK_IMPORTED_MODULE_0__engine_js__["default"]();  // Game engine
@@ -588,24 +597,12 @@ engine.init = function() {
 
   map.tileSet = './images/map.json';
 };
-// let blurRadius = 0;
+
 /**
  * The first part of main loop.
  * This function handles math related stuff, such as update entities, collision check.
  */
 engine.update = function(delta) {
-  // blurRadius += 1 * delta;
-  // engine.canvas.style.filter = `blur(${blurRadius}px)`;
-
-  if (window.shared.events.game === 'lose') {
-    sound.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
-    window.shared.events.game = null;
-  }
-
-  if (window.shared.events.game === 'win') {
-    sound.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
-    window.shared.events.game = null;
-  }
 
   console.log('delta: ' + delta);
   console.log('frames: ' + this.frames);
@@ -633,13 +630,7 @@ engine.update = function(delta) {
     value.update(delta);
   });
 
-  if (engine.collisionCheck(player, ...enemies).isCollided) {
-    // engine.pause();
-    player.pos.x = player.dest.x = 200;
-    player.pos.y = player.dest.y = 450;
-  }
-  // engine.collisionCheck(player, ...enemies);
-  // console.log(window.shared.events.game);
+  engine.collisionCheck(player, ...enemies);
 };
 
 /**
@@ -647,7 +638,6 @@ engine.update = function(delta) {
  * Clean up entire canvas before actually drawing this frame.
  */
 engine.cleanup = function() {
-  // engine.ctx.fillStyle = '#fff8e4';
   engine.ctx.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
 };
 
@@ -671,12 +661,15 @@ engine.render = function() {
 engine.run();
 
 /**
- * Handling user input.
+ * Handling events.
  */
 document.addEventListener('keydown', (event) => {
-  // player.events(event.key);
-  window.shared.events.key = event.key
-  event.preventDefault();
+  player.react(event);
+});
+
+document.addEventListener('break', (event) => {
+  player.react(event);
+  sound.react(event);
 });
 
 // setTimeout(() => {engine.pause()}, 4000);

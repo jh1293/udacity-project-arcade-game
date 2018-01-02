@@ -32,7 +32,6 @@ export default class Resources {
         audio.onload = function() {
           thisArg.resPool[resURL] = audio;
         }
-        // console.log(thisArg.resPool);
         return audio;
       }
 

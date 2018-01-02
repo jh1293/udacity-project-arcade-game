@@ -20,4 +20,16 @@ export default class Sound {
   play(audio) {
     this.effectsPool[audio].play();
   }
+
+  react(event) {
+    switch (event.detail) {
+      case 'collide':
+        this.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
+        break;
+      case 'reach':
+        this.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
+        break;
+    }
+
+  }
 }
