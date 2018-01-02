@@ -76,21 +76,37 @@ class Resources {
 
   load(resURL) {
     let thisArg = this;
+    let resURLArray = resURL.split('.');
+    let type = resURLArray[resURLArray.length - 1];
     if (thisArg.resPool[resURL]) {
       /**
        * If current requested resource already exists in resource pool, return it.
        */
       return thisArg.resPool[resURL];
     } else {
-      /**
-       * If current requested resource does not exists in resource pool, create new one and return it, then add it to the resource pool for caching.
-       */
-      let image = new Image();
-      image.src = resURL;
-      image.onload = function() {
-        thisArg.resPool[resURL] = image;
-      };
-      return image;
+
+      if (type === 'png') {
+        /**
+         * If current requested resource does not exists in resource pool, create new one and return it, then add it to the resource pool for caching.
+         */
+        let image = new Image();
+        image.src = resURL;
+        image.onload = function() {
+          thisArg.resPool[resURL] = image;
+        };
+        return image;
+      }
+
+      if (type === 'wav') {
+        let audio = new Audio();
+        audio.src = resURL;
+        audio.onload = function() {
+          thisArg.resPool[resURL] = audio;
+        }
+        // console.log(thisArg.resPool);
+        return audio;
+      }
+
     }
   }
 }
@@ -114,6 +130,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     this.delta = 0;
     this.frames = 0;
     this.state = null;
+    this.gameMode = '';
   }
 
   get fps() {
@@ -164,6 +181,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       diff_radius = subject.collision.radius + value.collision.radius;
       if (Number(distance) < Number(diff_radius)) {
         isCollided = true;
+        window.shared.events.game = 'lose';
+        // this.pause();
       }
     });
     return {isCollided: isCollided};
@@ -244,31 +263,17 @@ class Player extends Actor {
       x: 0,
       y: 0
     };
-    this.interval = 0.05
+    this.interval = 0.05;
     this.isMoving = false;
   }
 
   update(delta) {
-    // '10' at the end of each expression is a tolerance value.
-    if (this.dest.x < 0 - 10) {
-      this.dest.x = this.pos.x;
-    }
-    if (this.dest.x > 502 - this.width + 10) {
-      this.dest.x = this.pos.x;
-    }
-    if (this.dest.y < (-30) - 10) {
-      this.dest.y = this.pos.y;
-    }
-    if (this.dest.y > 652 - this.height + 10) {
-      this.dest.y = this.pos.y;
-    }
-    this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
-    this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;
-  }
 
-  events(evt) {
+
+
+    // Handle input event
     if (this.isMoving != true) {
-      switch (evt) {
+      switch (window.shared.events.key) {
         case "ArrowUp":
           this.dest.y = this.pos.y - 80;
           break;
@@ -282,9 +287,49 @@ class Player extends Actor {
           this.dest.x = this.pos.x + 100;
           break;
       }
+      window.shared.events.key = null;
       this.isMoving = true;
       setTimeout(() => {this.isMoving = false;}, this.interval * 4000);
     }
+
+
+    // Moveable area restriction
+    // '10' at the end of each expression is a tolerance value.
+    if (this.dest.x < 0 - 10) {
+      this.dest.x = this.pos.x;
+    }
+    if (this.dest.x > 500 - this.width + 10) {
+      this.dest.x = this.pos.x;
+    }
+    if (this.dest.y < (-30) - 10) {
+      this.dest.y = this.pos.y;
+    }
+    if (this.dest.y > 650 - this.height + 10) {
+      this.dest.y = this.pos.y;
+    }
+
+
+
+    // Condition to win
+    if (this.pos.y < -28) {
+      window.shared.events.game = 'win';
+    }
+
+    // if (window.shared.events.game === 'lose') {
+    //   this.pos.x = this.dest.x = 200;
+    //   this.pos.y = this.dest.y = 450;
+    // }
+
+    if (window.shared.events.game) {
+      this.pos.x = this.dest.x = 200;
+      this.pos.y = this.dest.y = 450;
+    }
+
+    // Update position
+    this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
+    this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;
+
+
   }
 }
 
@@ -341,7 +386,35 @@ class Input {
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources_js__ = __webpack_require__(0);
+
+
+let resources = new __WEBPACK_IMPORTED_MODULE_0__resources_js__["default"]();
+
+class Sound {
+  constructor() {
+    this.effectsPool = {};
+  }
+
+  get effects() {
+    return this.effectsPool;
+  }
+
+  set effects(effects) {
+    effects.forEach((value) => {
+      this.effectsPool[value] = resources.load(value);
+    });
+  }
+
+  play(audio) {
+    this.effectsPool[audio].play();
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["default"] = Sound;
 
 
 
@@ -404,7 +477,8 @@ __webpack_require__(8);
 __webpack_require__(3);
 __webpack_require__(5);
 __webpack_require__(0);
-module.exports = __webpack_require__(4);
+__webpack_require__(4);
+module.exports = __webpack_require__(9);
 
 
 /***/ }),
@@ -444,7 +518,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources_js__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__input_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__sound_js__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__sound_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__sound_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__entities_js__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__map_js__ = __webpack_require__(5);
 
@@ -455,9 +528,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /**
+ * Global variables.
+ */
+window.shared = {
+  events: {
+    game: null,
+    key: null
+  }
+};
+
+/**
  * Instantiating area.
  */
 let engine = new __WEBPACK_IMPORTED_MODULE_0__engine_js__["default"]();  // Game engine
+let sound = new __WEBPACK_IMPORTED_MODULE_3__sound_js__["default"]();  // Sound system
 let player = new __WEBPACK_IMPORTED_MODULE_4__entities_js__["Player"]();  // Player entity
 let enemies = [];
 for (let i = 0; i < 8; i++) {
@@ -470,13 +554,22 @@ let map = new __WEBPACK_IMPORTED_MODULE_5__map_js__["default"]();  // Map
  * Create canvas.
  * Being the first step of all creations.
  */
-engine.create(502, 652);
+engine.create(500, 650);
 
 /**
  * All the initialization works should be done within this function.
  * The game engine will only call this function one time brfore main loop starts.
  */
 engine.init = function() {
+
+  sound.effects = [
+    './audio/hit1.wav',
+    './audio/hit2.wav',
+    './audio/win1.wav',
+    './audio/win2.wav',
+    './audio/win3.wav',
+    './audio/win4.wav'
+  ];
 
   player.spriter = './images/char-boy.png';
   player.pos.x = player.dest.x = 200;
@@ -495,12 +588,24 @@ engine.init = function() {
 
   map.tileSet = './images/map.json';
 };
-
+// let blurRadius = 0;
 /**
  * The first part of main loop.
  * This function handles math related stuff, such as update entities, collision check.
  */
 engine.update = function(delta) {
+  // blurRadius += 1 * delta;
+  // engine.canvas.style.filter = `blur(${blurRadius}px)`;
+
+  if (window.shared.events.game === 'lose') {
+    sound.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
+    window.shared.events.game = null;
+  }
+
+  if (window.shared.events.game === 'win') {
+    sound.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
+    window.shared.events.game = null;
+  }
 
   console.log('delta: ' + delta);
   console.log('frames: ' + this.frames);
@@ -528,12 +633,13 @@ engine.update = function(delta) {
     value.update(delta);
   });
 
-
-
   if (engine.collisionCheck(player, ...enemies).isCollided) {
-    engine.pause();
-  } else {
-  };
+    // engine.pause();
+    player.pos.x = player.dest.x = 200;
+    player.pos.y = player.dest.y = 450;
+  }
+  // engine.collisionCheck(player, ...enemies);
+  // console.log(window.shared.events.game);
 };
 
 /**
@@ -541,6 +647,7 @@ engine.update = function(delta) {
  * Clean up entire canvas before actually drawing this frame.
  */
 engine.cleanup = function() {
+  // engine.ctx.fillStyle = '#fff8e4';
   engine.ctx.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
 };
 
@@ -567,11 +674,20 @@ engine.run();
  * Handling user input.
  */
 document.addEventListener('keydown', (event) => {
-  player.events(event.key);
+  // player.events(event.key);
+  window.shared.events.key = event.key
   event.preventDefault();
 });
 
-setTimeout(() => {engine.pause()}, 4000);
+// setTimeout(() => {engine.pause()}, 4000);
+
+// setTimeout(() => {engine.pause()}, 2000);
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
 
 
 /***/ })

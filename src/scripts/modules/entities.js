@@ -46,31 +46,17 @@ class Player extends Actor {
       x: 0,
       y: 0
     };
-    this.interval = 0.05
+    this.interval = 0.05;
     this.isMoving = false;
   }
 
   update(delta) {
-    // '10' at the end of each expression is a tolerance value.
-    if (this.dest.x < 0 - 10) {
-      this.dest.x = this.pos.x;
-    }
-    if (this.dest.x > 502 - this.width + 10) {
-      this.dest.x = this.pos.x;
-    }
-    if (this.dest.y < (-30) - 10) {
-      this.dest.y = this.pos.y;
-    }
-    if (this.dest.y > 652 - this.height + 10) {
-      this.dest.y = this.pos.y;
-    }
-    this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
-    this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;
-  }
 
-  events(evt) {
+
+
+    // Handle input event
     if (this.isMoving != true) {
-      switch (evt) {
+      switch (window.shared.events.key) {
         case "ArrowUp":
           this.dest.y = this.pos.y - 80;
           break;
@@ -84,9 +70,51 @@ class Player extends Actor {
           this.dest.x = this.pos.x + 100;
           break;
       }
+      window.shared.events.key = null;
       this.isMoving = true;
       setTimeout(() => {this.isMoving = false;}, this.interval * 4000);
     }
+
+
+    // Moveable area restriction
+    // '10' at the end of each expression is a tolerance value.
+    if (this.dest.x < 0 - 10) {
+      this.dest.x = this.pos.x;
+    }
+    if (this.dest.x > 500 - this.width + 10) {
+      this.dest.x = this.pos.x;
+    }
+    if (this.dest.y < (-30) - 10) {
+      this.dest.y = this.pos.y;
+    }
+    if (this.dest.y > 650 - this.height + 10) {
+      this.dest.y = this.pos.y;
+    }
+
+
+
+    // Condition to win
+    if (this.pos.y < -28) {
+      window.shared.events.game = 'win';
+    }
+
+    // if (window.shared.events.game === 'lose') {
+    //   this.pos.x = this.dest.x = 200;
+    //   this.pos.y = this.dest.y = 450;
+    // }
+
+    if (window.shared.events.game) {
+      this.pos.x = this.dest.x = 200;
+      this.pos.y = this.dest.y = 450;
+    }
+
+    // Update position
+    this.pos.x += (this.dest.x - this.pos.x) / this.interval * delta;
+    this.pos.y += (this.dest.y - this.pos.y) / this.interval * delta;
+  }
+
+  event() {
+    
   }
 }
 

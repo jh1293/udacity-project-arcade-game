@@ -8,6 +8,7 @@ export default class Engine {
     this.delta = 0;
     this.frames = 0;
     this.state = null;
+    this.gameMode = '';
   }
 
   get fps() {
@@ -58,6 +59,8 @@ export default class Engine {
       diff_radius = subject.collision.radius + value.collision.radius;
       if (Number(distance) < Number(diff_radius)) {
         isCollided = true;
+        window.shared.events.game = 'lose';
+        // this.pause();
       }
     });
     return {isCollided: isCollided};
