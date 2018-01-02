@@ -94,15 +94,19 @@ class Player extends Actor {
     // Handle input event
     if (this.isMoving != true) {
       switch (event.key) {
+        case 'Up':
         case 'ArrowUp':
           this.dest.y = this.pos.y - 80;
           break;
+        case 'Down':
         case 'ArrowDown':
           this.dest.y = this.pos.y + 80;
           break;
+        case 'Left':
         case 'ArrowLeft':
           this.dest.x = this.pos.x - 100;
           break;
+        case 'Right':
         case 'ArrowRight':
           this.dest.x = this.pos.x + 100;
           break;

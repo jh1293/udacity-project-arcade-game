@@ -1,6 +1,7 @@
 import Engine from './engine.js';
 import Resources from './resources.js';
-import Input from './input.js';
+import UI from './ui.js';
+// import Input from './input.js';
 import Sound from './sound.js';
 import { Actor, Player, Enemy } from './entities.js';
 import Map from './map.js';
@@ -9,6 +10,7 @@ import Map from './map.js';
  * Instantiating area.
  */
 let engine = new Engine();  // Game engine
+let ui = new UI();  // Game engine
 let sound = new Sound();  // Sound system
 let player = new Player();  // Player entity
 let enemies = [];
@@ -22,6 +24,7 @@ let map = new Map();  // Map
  * Create canvas.
  * Being the first step of all creations.
  */
+ui.viewport.create(500, 650);
 engine.create(500, 650);
 
 /**
@@ -63,11 +66,11 @@ engine.init = function() {
  */
 engine.update = function(delta) {
 
-  console.log('delta: ' + delta);
-  console.log('frames: ' + this.frames);
-  console.log('fps: ' + this.fps);
-  console.log('engine state: ' + this.state);
-  console.log('----------------');
+  // console.log('delta: ' + delta);
+  // console.log('frames: ' + this.frames);
+  // console.log('fps: ' + this.fps);
+  // console.log('engine state: ' + this.state);
+  // console.log('----------------');
 
   player.collision = {
         center: {
@@ -123,12 +126,17 @@ engine.run();
  * Handling events.
  */
 document.addEventListener('keydown', (event) => {
+  console.log(event.key);
   player.react(event);
 });
 
 document.addEventListener('break', (event) => {
   player.react(event);
   sound.react(event);
+  switch(event.detail) {
+    case 'reach':
+      engine.pause();
+  }
 });
 
 // setTimeout(() => {engine.pause()}, 4000);

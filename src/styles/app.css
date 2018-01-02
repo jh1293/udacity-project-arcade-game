@@ -4,5 +4,8 @@
 body {
   margin: 0; }
 
-canvas {
+.viewport {
+  overflow: hidden;
+  width: 500px;
+  height: 650px;
   border-radius: 8px; }

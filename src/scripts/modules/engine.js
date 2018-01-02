@@ -18,7 +18,8 @@ export default class Engine {
   create(width, height) {
     this.canvas.width = width;
     this.canvas.height = height;
-    this.document.body.appendChild(this.canvas);
+    this.canvas.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
+    document.getElementById('viewport').appendChild(this.canvas);
   }
 
   run() {

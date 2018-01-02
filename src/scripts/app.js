@@ -139,7 +139,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   create(width, height) {
     this.canvas.width = width;
     this.canvas.height = height;
-    this.document.body.appendChild(this.canvas);
+    this.canvas.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
+    document.getElementById('viewport').appendChild(this.canvas);
   }
 
   run() {
@@ -310,15 +311,19 @@ class Player extends Actor {
     // Handle input event
     if (this.isMoving != true) {
       switch (event.key) {
+        case 'Up':
         case 'ArrowUp':
           this.dest.y = this.pos.y - 80;
           break;
+        case 'Down':
         case 'ArrowDown':
           this.dest.y = this.pos.y + 80;
           break;
+        case 'Left':
         case 'ArrowLeft':
           this.dest.x = this.pos.x - 100;
           break;
+        case 'Right':
         case 'ArrowRight':
           this.dest.x = this.pos.x + 100;
           break;
@@ -365,29 +370,30 @@ class Enemy extends Actor {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-class Input {
+class UI {
   constructor() {
+    this.viewport = {
+      element: null,
+      create: (width, height) => {
+        this.element = document.createElement('div');
+        this.element.className = 'viewport';
+        this.element.id = 'viewport';
+        this.element.style.width = String(width) + 'px';
+        this.element.style.height = String(height) + 'px';
+        document.body.appendChild(this.element);
+      }
+    };
+  }
+
+  update() {
 
   }
 
-  listen() {
-    document.addEventListener('keyup', (event) => {
-      switch (event.key) {
-        case "ArrowUp":
-          console.log('up');
-          break;
-        case "ArrowDown":
-          break;
-        case "ArrowLeft":
-          break;
-        case "ArrowRight":
-          break;
-      }
-      event.preventDefault();
-    });
+  render() {
+
   }
 }
-/* harmony export (immutable) */ __webpack_exports__["default"] = Input;
+/* harmony export (immutable) */ __webpack_exports__["default"] = UI;
 
 
 
@@ -493,11 +499,11 @@ class Map {
 __webpack_require__(1);
 __webpack_require__(2);
 __webpack_require__(8);
-__webpack_require__(3);
+__webpack_require__(9);
 __webpack_require__(5);
 __webpack_require__(0);
 __webpack_require__(4);
-module.exports = __webpack_require__(9);
+module.exports = __webpack_require__(3);
 
 
 /***/ }),
@@ -535,13 +541,14 @@ module.exports = g;
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine_js__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__input_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__sound_js__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__entities_js__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__map_js__ = __webpack_require__(5);
 
 
 
+// import Input from './input.js';
 
 
 
@@ -550,6 +557,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * Instantiating area.
  */
 let engine = new __WEBPACK_IMPORTED_MODULE_0__engine_js__["default"]();  // Game engine
+let ui = new __WEBPACK_IMPORTED_MODULE_2__ui_js__["default"]();  // Game engine
 let sound = new __WEBPACK_IMPORTED_MODULE_3__sound_js__["default"]();  // Sound system
 let player = new __WEBPACK_IMPORTED_MODULE_4__entities_js__["Player"]();  // Player entity
 let enemies = [];
@@ -563,6 +571,7 @@ let map = new __WEBPACK_IMPORTED_MODULE_5__map_js__["default"]();  // Map
  * Create canvas.
  * Being the first step of all creations.
  */
+ui.viewport.create(500, 650);
 engine.create(500, 650);
 
 /**
@@ -604,11 +613,11 @@ engine.init = function() {
  */
 engine.update = function(delta) {
 
-  console.log('delta: ' + delta);
-  console.log('frames: ' + this.frames);
-  console.log('fps: ' + this.fps);
-  console.log('engine state: ' + this.state);
-  console.log('----------------');
+  // console.log('delta: ' + delta);
+  // console.log('frames: ' + this.frames);
+  // console.log('fps: ' + this.fps);
+  // console.log('engine state: ' + this.state);
+  // console.log('----------------');
 
   player.collision = {
         center: {
@@ -664,12 +673,17 @@ engine.run();
  * Handling events.
  */
 document.addEventListener('keydown', (event) => {
+  console.log(event.key);
   player.react(event);
 });
 
 document.addEventListener('break', (event) => {
   player.react(event);
   sound.react(event);
+  switch(event.detail) {
+    case 'reach':
+      engine.pause();
+  }
 });
 
 // setTimeout(() => {engine.pause()}, 4000);
@@ -679,7 +693,33 @@ document.addEventListener('break', (event) => {
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+class Input {
+  constructor() {
+
+  }
+
+  listen() {
+    document.addEventListener('keyup', (event) => {
+      switch (event.key) {
+        case "ArrowUp":
+          console.log('up');
+          break;
+        case "ArrowDown":
+          break;
+        case "ArrowLeft":
+          break;
+        case "ArrowRight":
+          break;
+      }
+      event.preventDefault();
+    });
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["default"] = Input;
 
 
 
