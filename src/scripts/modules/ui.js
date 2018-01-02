@@ -3,12 +3,12 @@ export default class UI {
     this.viewport = {
       element: null,
       create: (width, height) => {
-        this.element = document.createElement('div');
-        this.element.className = 'viewport';
-        this.element.id = 'viewport';
-        this.element.style.width = String(width) + 'px';
-        this.element.style.height = String(height) + 'px';
-        document.body.appendChild(this.element);
+        this.viewport.element = document.createElement('div');
+        this.viewport.element.className = 'viewport';
+        this.viewport.element.id = 'viewport';
+        this.viewport.element.style.width = String(width) + 'px';
+        this.viewport.element.style.height = String(height) + 'px';
+        document.body.appendChild(this.viewport.element);
       }
     };
   }

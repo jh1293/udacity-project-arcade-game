@@ -25,7 +25,7 @@ let map = new Map();  // Map
  * Being the first step of all creations.
  */
 ui.viewport.create(500, 650);
-engine.create(500, 650);
+engine.canvas.create(500, 650);
 
 /**
  * All the initialization works should be done within this function.
@@ -100,7 +100,7 @@ engine.update = function(delta) {
  * Clean up entire canvas before actually drawing this frame.
  */
 engine.cleanup = function() {
-  engine.ctx.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
+  engine.canvas.context.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
 };
 
 /**
@@ -109,12 +109,12 @@ engine.cleanup = function() {
  */
 engine.render = function() {
 
-  map.render(engine.ctx);
+  map.render(engine.canvas.context);
 
   enemies.forEach((value) => {
-    value.render(engine.ctx);
+    value.render(engine.canvas.context);
   });
-  player.render(engine.ctx);
+  player.render(engine.canvas.context);
 };
 
 /**
@@ -126,7 +126,6 @@ engine.run();
  * Handling events.
  */
 document.addEventListener('keydown', (event) => {
-  console.log(event.key);
   player.react(event);
 });
 

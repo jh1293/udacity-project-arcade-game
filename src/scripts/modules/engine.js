@@ -1,9 +1,21 @@
 export default class Engine {
   constructor() {
-    this.window = global.window;
-    this.document = global.document;
-    this.canvas = global.document.createElement('canvas');
-    this.ctx = this.canvas.getContext('2d');
+    this.canvas = {
+      element: null,
+      context: null,
+      width: null,
+      height: null,
+      create: (width, height) => {
+        this.canvas.element = document.createElement('canvas');
+        this.canvas.context = this.canvas.element.getContext('2d');
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.canvas.element.width = width;
+        this.canvas.element.height = height;
+        this.canvas.element.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
+        document.getElementById('viewport').appendChild(this.canvas.element);
+      }
+    };
     this.stamp = 0;
     this.delta = 0;
     this.frames = 0;
@@ -13,13 +25,6 @@ export default class Engine {
 
   get fps() {
     return this.delta === 0 ? 0: Math.trunc(1 / this.delta);
-  }
-
-  create(width, height) {
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.canvas.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
-    document.getElementById('viewport').appendChild(this.canvas);
   }
 
   run() {
@@ -40,7 +45,7 @@ export default class Engine {
           this.cleanup();
           this.render();
       }
-      this.loopID = this.window.requestAnimationFrame(loop.bind(this));
+      this.loopID = window.requestAnimationFrame(loop.bind(this));
     }
     loop.call(this);
     /**
@@ -76,6 +81,6 @@ export default class Engine {
   }
 
   stop() {
-    this.window.cancelAnimationFrame(this.loopID);
+    window.cancelAnimationFrame(this.loopID);
   }
 }

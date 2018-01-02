@@ -119,12 +119,24 @@ class Resources {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* WEBPACK VAR INJECTION */(function(global) {class Engine {
+class Engine {
   constructor() {
-    this.window = global.window;
-    this.document = global.document;
-    this.canvas = global.document.createElement('canvas');
-    this.ctx = this.canvas.getContext('2d');
+    this.canvas = {
+      element: null,
+      context: null,
+      width: null,
+      height: null,
+      create: (width, height) => {
+        this.canvas.element = document.createElement('canvas');
+        this.canvas.context = this.canvas.element.getContext('2d');
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.canvas.element.width = width;
+        this.canvas.element.height = height;
+        this.canvas.element.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
+        document.getElementById('viewport').appendChild(this.canvas.element);
+      }
+    };
     this.stamp = 0;
     this.delta = 0;
     this.frames = 0;
@@ -134,13 +146,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
   get fps() {
     return this.delta === 0 ? 0: Math.trunc(1 / this.delta);
-  }
-
-  create(width, height) {
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.canvas.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
-    document.getElementById('viewport').appendChild(this.canvas);
   }
 
   run() {
@@ -161,7 +166,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
           this.cleanup();
           this.render();
       }
-      this.loopID = this.window.requestAnimationFrame(loop.bind(this));
+      this.loopID = window.requestAnimationFrame(loop.bind(this));
     }
     loop.call(this);
     /**
@@ -197,13 +202,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   }
 
   stop() {
-    this.window.cancelAnimationFrame(this.loopID);
+    window.cancelAnimationFrame(this.loopID);
   }
 }
 /* harmony export (immutable) */ __webpack_exports__["default"] = Engine;
 
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(7)))
 
 /***/ }),
 /* 2 */
@@ -375,12 +379,12 @@ class UI {
     this.viewport = {
       element: null,
       create: (width, height) => {
-        this.element = document.createElement('div');
-        this.element.className = 'viewport';
-        this.element.id = 'viewport';
-        this.element.style.width = String(width) + 'px';
-        this.element.style.height = String(height) + 'px';
-        document.body.appendChild(this.element);
+        this.viewport.element = document.createElement('div');
+        this.viewport.element.className = 'viewport';
+        this.viewport.element.id = 'viewport';
+        this.viewport.element.style.width = String(width) + 'px';
+        this.viewport.element.style.height = String(height) + 'px';
+        document.body.appendChild(this.viewport.element);
       }
     };
   }
@@ -498,8 +502,8 @@ class Map {
 
 __webpack_require__(1);
 __webpack_require__(2);
+__webpack_require__(7);
 __webpack_require__(8);
-__webpack_require__(9);
 __webpack_require__(5);
 __webpack_require__(0);
 __webpack_require__(4);
@@ -508,33 +512,6 @@ module.exports = __webpack_require__(3);
 
 /***/ }),
 /* 7 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -572,7 +549,7 @@ let map = new __WEBPACK_IMPORTED_MODULE_5__map_js__["default"]();  // Map
  * Being the first step of all creations.
  */
 ui.viewport.create(500, 650);
-engine.create(500, 650);
+engine.canvas.create(500, 650);
 
 /**
  * All the initialization works should be done within this function.
@@ -647,7 +624,7 @@ engine.update = function(delta) {
  * Clean up entire canvas before actually drawing this frame.
  */
 engine.cleanup = function() {
-  engine.ctx.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
+  engine.canvas.context.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
 };
 
 /**
@@ -656,12 +633,12 @@ engine.cleanup = function() {
  */
 engine.render = function() {
 
-  map.render(engine.ctx);
+  map.render(engine.canvas.context);
 
   enemies.forEach((value) => {
-    value.render(engine.ctx);
+    value.render(engine.canvas.context);
   });
-  player.render(engine.ctx);
+  player.render(engine.canvas.context);
 };
 
 /**
@@ -673,7 +650,6 @@ engine.run();
  * Handling events.
  */
 document.addEventListener('keydown', (event) => {
-  console.log(event.key);
   player.react(event);
 });
 
@@ -692,7 +668,7 @@ document.addEventListener('break', (event) => {
 
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
