@@ -1,12 +1,28 @@
-@import 'reset';
+@import 'general/reset';
+@import 'general/animations';
+@import 'general/component';
 
-.viewport {
-  overflow: hidden;
-  width: 500px;
-  height: 650px;
-  border-radius: 8px;
+body {
+  background: url(/images/bg.png);
 }
 
-canvas {
+.game {
+  width: 500px;
+  height: 650px;
+  margin: 0.5em auto;
+}
 
+.monitor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 40px;
+  padding: 0.5em;
+  color: #fff;
+  background: #00f;
+
+  .monitor__entry{
+    font: 0.7em/1.2 Arial;
+  }
 }

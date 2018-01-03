@@ -1,26 +1,15 @@
 export default class Engine {
   constructor() {
-    this.canvas = {
-      element: null,
-      context: null,
-      width: null,
-      height: null,
-      create: (width, height) => {
-        this.canvas.element = document.createElement('canvas');
-        this.canvas.context = this.canvas.element.getContext('2d');
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.canvas.element.width = width;
-        this.canvas.element.height = height;
-        this.canvas.element.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
-        document.getElementById('viewport').appendChild(this.canvas.element);
-      }
-    };
+    this.target = null;
     this.stamp = 0;
     this.delta = 0;
     this.frames = 0;
     this.state = null;
     this.gameMode = '';
+  }
+
+  bind(context) {
+    this.target = context;
   }
 
   get fps() {
@@ -42,8 +31,8 @@ export default class Engine {
       if (this.state === 100) {
           this.frames++;
           this.update(this.delta);
-          this.cleanup();
-          this.render();
+          this.cleanup(this.target);
+          this.render(this.target);
       }
       this.loopID = window.requestAnimationFrame(loop.bind(this));
     }
@@ -57,19 +46,17 @@ export default class Engine {
   }
 
   collisionCheck(subject, ...object) {
-    let dx, dy, distance, diff_radius, isCollided;
+    let dx, dy, distance, diff_radius;
     object.forEach((value) => {
       dx = subject.collision.center.x - value.collision.center.x;
       dy = subject.collision.center.y - value.collision.center.y;
       distance = Math.sqrt(dx * dx + dy * dy);
       diff_radius = subject.collision.radius + value.collision.radius;
       if (Number(distance) < Number(diff_radius)) {
-        isCollided = true;
         let event = new CustomEvent('break', {detail: 'collide'});
         document.dispatchEvent(event);
       }
     });
-    // return {isCollided: isCollided};
   }
 
   resume() {

@@ -119,29 +119,52 @@ class Resources {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources_js__ = __webpack_require__(0);
+
+
+let resources = new __WEBPACK_IMPORTED_MODULE_0__resources_js__["default"]();
+
+class Audio {
+  constructor() {
+    this.effectsPool = {};
+  }
+
+  get effects() {
+    return this.effectsPool;
+  }
+
+  set effects(effects) {
+    effects.forEach((value) => {
+      this.effectsPool[value] = resources.load(value);
+    });
+  }
+
+  play(audio) {
+    this.effectsPool[audio].play();
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["default"] = Audio;
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 class Engine {
   constructor() {
-    this.canvas = {
-      element: null,
-      context: null,
-      width: null,
-      height: null,
-      create: (width, height) => {
-        this.canvas.element = document.createElement('canvas');
-        this.canvas.context = this.canvas.element.getContext('2d');
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.canvas.element.width = width;
-        this.canvas.element.height = height;
-        this.canvas.element.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
-        document.getElementById('viewport').appendChild(this.canvas.element);
-      }
-    };
+    this.target = null;
     this.stamp = 0;
     this.delta = 0;
     this.frames = 0;
     this.state = null;
     this.gameMode = '';
+  }
+
+  bind(context) {
+    this.target = context;
   }
 
   get fps() {
@@ -163,8 +186,8 @@ class Engine {
       if (this.state === 100) {
           this.frames++;
           this.update(this.delta);
-          this.cleanup();
-          this.render();
+          this.cleanup(this.target);
+          this.render(this.target);
       }
       this.loopID = window.requestAnimationFrame(loop.bind(this));
     }
@@ -178,19 +201,17 @@ class Engine {
   }
 
   collisionCheck(subject, ...object) {
-    let dx, dy, distance, diff_radius, isCollided;
+    let dx, dy, distance, diff_radius;
     object.forEach((value) => {
       dx = subject.collision.center.x - value.collision.center.x;
       dy = subject.collision.center.y - value.collision.center.y;
       distance = Math.sqrt(dx * dx + dy * dy);
       diff_radius = subject.collision.radius + value.collision.radius;
       if (Number(distance) < Number(diff_radius)) {
-        isCollided = true;
         let event = new CustomEvent('break', {detail: 'collide'});
         document.dispatchEvent(event);
       }
     });
-    // return {isCollided: isCollided};
   }
 
   resume() {
@@ -210,7 +231,7 @@ class Engine {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -369,81 +390,151 @@ class Enemy extends Actor {
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-class UI {
-  constructor() {
-    this.viewport = {
-      element: null,
-      create: (width, height) => {
-        this.viewport.element = document.createElement('div');
-        this.viewport.element.className = 'viewport';
-        this.viewport.element.id = 'viewport';
-        this.viewport.element.style.width = String(width) + 'px';
-        this.viewport.element.style.height = String(height) + 'px';
-        document.body.appendChild(this.viewport.element);
-      }
-    };
-  }
-
-  update() {
-
-  }
-
-  render() {
-
-  }
-}
-/* harmony export (immutable) */ __webpack_exports__["default"] = UI;
-
-
-
-/***/ }),
 /* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GUI", function() { return GUI; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Viewport", function() { return Viewport; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Canvas", function() { return Canvas; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Panel", function() { return Panel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Button", function() { return Button; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Sprite", function() { return Sprite; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Textbox", function() { return Textbox; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources_js__ = __webpack_require__(0);
 
 
 let resources = new __WEBPACK_IMPORTED_MODULE_0__resources_js__["default"]();
 
-class Sound {
-  constructor() {
-    this.effectsPool = {};
+class GUI {
+  constructor(posX, posY, width, height, className, id) {
+    this.element = document.createElement('div');
+    this.element.className = className;
+    this.element.id = id;
+    this.element.style.left = posX + 'px';
+    this.element.style.top = posY + 'px';
+    this.element.style.width = width + 'px';
+    this.element.style.height = height + 'px';
+    this.element.style.position = 'absolute';
+    this.element.style.visibility = 'hidden';
   }
 
-  get effects() {
-    return this.effectsPool;
+  appendTo(id) {
+    document.getElementById(id).appendChild(this.element)
   }
 
-  set effects(effects) {
-    effects.forEach((value) => {
-      this.effectsPool[value] = resources.load(value);
-    });
+  hide(duration = 0, delay = 0) {
+    setTimeout(() => {
+      this.element.style.animation = `fadeout ${duration}s forwards`;
+      setTimeout(() => {
+        this.element.style.visibility = 'hidden';
+      }, duration * 1000)
+    }, delay * 1000);
   }
 
-  play(audio) {
-    this.effectsPool[audio].play();
+  show(duration = 0, delay = 0) {
+    setTimeout(() => {
+      this.element.style.visibility = 'visible';
+      this.element.style.animation = `fadein ${duration}s forwards`;
+    }, delay * 1000);
+
   }
 
-  react(event) {
-    switch (event.detail) {
-      case 'collide':
-        this.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
-        break;
-      case 'reach':
-        this.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
-        break;
-    }
+  focus(duration = 0, delay = 0) {
+    setTimeout(() => {
+      this.element.style.animation = `focus ${duration}s forwards`;
+    }, delay * 1000);
+  }
 
+  unfocus(duration = 0, delay = 0) {
+    setTimeout(() => {
+      this.element.style.animation = `unfocus ${duration}s forwards`;
+    }, delay * 1000);
   }
 }
-/* harmony export (immutable) */ __webpack_exports__["default"] = Sound;
+
+class Viewport extends GUI {
+  constructor(width, height, className, id) {
+    super(null, null, width, height, className, id);
+    this.element.style.position = 'relative';
+    this.element.style.overflow = 'hidden';
+  }
+}
+
+class Canvas extends GUI {
+  constructor(width, height, className, id) {
+    super(null, null, width, height, className, id);
+    this.element = document.createElement('canvas');
+    this.element.width = width;
+    this.element.height = height;
+    this.element.innerHTML = 'It seems like your browser doesn\'t support HTML5.';
+    this.element.style.position = 'absolute';
+    this.element.style.zIndex = 0;
+    this.element.style.visibility = 'hidden';
+  }
+
+  get width() {
+    return this.element.width;
+  }
+
+  get height() {
+    return this.element.height;
+  }
+
+  get context() {
+    return this.element.getContext('2d');
+  }
+}
+
+class Panel extends GUI {
+  constructor(posX, posY, width, height, className, id) {
+    super(posX, posY, width, height, className, id);
+    this.element.style.zIndex = 100;
+  }
+}
+
+class Button extends GUI {
+  constructor(posX, posY, width, height, className, id, value) {
+    super(posX, posY, width, height, className, id);
+    this.element = document.createElement('button');
+    this.element.className = className;
+    this.element.id = id;
+    this.element.style.left = posX + 'px';
+    this.element.style.top = posY + 'px';
+    this.element.style.width = width + 'px';
+    this.element.style.height = height + 'px';
+    this.element.style.position = 'absolute';
+    this.element.innerHTML = value;
+    this.element.style.visibility = 'hidden';
+  }
+}
+
+class Sprite extends GUI {
+  constructor(posX, posY, width, height, className, id, src) {
+    super(posX, posY, width, height, className, id);
+    this.element = resources.load(src);
+    this.element.className = className;
+    this.element.id = id;
+    this.element.style.left = posX + 'px';
+    this.element.style.top = posY + 'px';
+    this.element.style.width = width + 'px';
+    this.element.style.height = height + 'px';
+    this.element.style.position = 'absolute';
+  }
+}
+
+class Textbox extends GUI {
+  constructor(posX, posY, width, height, className, id) {
+    super(posX, posY, width, height, className, id);
+    this.element.innerHTML = 'Choose Your Character';
+  }
+
+  text(text) {
+    this.element.innerHTML = text;
+  }
+}
+
 
 
 
@@ -502,12 +593,12 @@ class Map {
 
 __webpack_require__(1);
 __webpack_require__(2);
+__webpack_require__(3);
 __webpack_require__(7);
+__webpack_require__(4);
 __webpack_require__(8);
 __webpack_require__(5);
-__webpack_require__(0);
-__webpack_require__(4);
-module.exports = __webpack_require__(3);
+module.exports = __webpack_require__(0);
 
 
 /***/ }),
@@ -516,11 +607,11 @@ module.exports = __webpack_require__(3);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine_js__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources_js__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ui_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__sound_js__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__entities_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gui_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__audio_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__entities_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__map_js__ = __webpack_require__(5);
 
 
@@ -534,8 +625,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * Instantiating area.
  */
 let engine = new __WEBPACK_IMPORTED_MODULE_0__engine_js__["default"]();  // Game engine
-let ui = new __WEBPACK_IMPORTED_MODULE_2__ui_js__["default"]();  // Game engine
-let sound = new __WEBPACK_IMPORTED_MODULE_3__sound_js__["default"]();  // Sound system
+let viewport = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Viewport"](500, 650, 'viewport', 'viewport');  // Viewport
+let canvas = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Canvas"](500, 650, 'canvas', 'canvas');  // canvas
+let panel = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Panel"](50, 100, 400, 450, 'panel', 'panel');
+let btnStart = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Button"](140, 350, 120, 50, 'btn btn__control--color-green', 'btn-start', 'Start');
+let btnPause = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Button"](10, 10, 80, 30, 'btn btn__control--color-orange', 'btn-pause', 'Pause');
+let optChar1 = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Sprite"](30, 0, 101, 170, 'sprite__char', 'char-1', './images/char-boy.png');
+let optChar2 = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Sprite"](150, 0, 101, 170, 'sprite__char', 'char-2', './images/char-cat-girl.png');
+let optChar3 = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Sprite"](270, 0, 101, 170, 'sprite__char', 'char-3', './images/char-horn-girl.png');
+let optChar4 = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Sprite"](90, 120, 101, 170, 'sprite__char', 'char-4', './images/char-pink-girl.png');
+let optChar5 = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Sprite"](210, 120, 101, 170, 'sprite__char', 'char-5', './images/char-princess-girl.png');
+let panelMsg = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Textbox"](0, 300, 400, 50, 'panel__msg', 'msg');
+let audio = new __WEBPACK_IMPORTED_MODULE_3__audio_js__["default"]();  // Sound system
 let player = new __WEBPACK_IMPORTED_MODULE_4__entities_js__["Player"]();  // Player entity
 let enemies = [];
 for (let i = 0; i < 8; i++) {
@@ -545,11 +646,21 @@ for (let i = 0; i < 8; i++) {
 let map = new __WEBPACK_IMPORTED_MODULE_5__map_js__["default"]();  // Map
 
 /**
- * Create canvas.
+ * Global variables.
+ */
+let playerCharacter = null;
+
+/**
+ * Building scene tree.
  * Being the first step of all creations.
  */
-ui.viewport.create(500, 650);
-engine.canvas.create(500, 650);
+viewport.appendTo('game');
+canvas.appendTo('viewport');
+
+/**
+ * Bind engine to the canvas.
+ */
+engine.bind(canvas.context);
 
 /**
  * All the initialization works should be done within this function.
@@ -557,7 +668,7 @@ engine.canvas.create(500, 650);
  */
 engine.init = function() {
 
-  sound.effects = [
+  audio.effects = [
     './audio/hit1.wav',
     './audio/hit2.wav',
     './audio/win1.wav',
@@ -566,13 +677,13 @@ engine.init = function() {
     './audio/win4.wav'
   ];
 
-  player.spriter = './images/char-boy.png';
+  player.spriter = playerCharacter || './images/char-boy.png';
   player.pos.x = player.dest.x = 200;
   player.pos.y = player.dest.y = 450;
 
   enemies.forEach((value, index) => {
     value.spriter = './images/enemy-bug.png';
-    value.pos.x = ((Math.random() * 3) + 1) * (-300);  // Keep cars away as the game starts
+    value.pos.x = ((Math.random() * 3) + 1) * (-200);  // Keep cars away as the game starts
     if (index % 4 === 0) {  // For each line of stone, there are two cars running
       enemies[index].pos.y = 50;
       enemies[index + 1].pos.y = 130;
@@ -590,11 +701,9 @@ engine.init = function() {
  */
 engine.update = function(delta) {
 
-  // console.log('delta: ' + delta);
-  // console.log('frames: ' + this.frames);
-  // console.log('fps: ' + this.fps);
-  // console.log('engine state: ' + this.state);
-  // console.log('----------------');
+  document.getElementById('m-dt').innerHTML = delta.toFixed(4);
+  document.getElementById('m-frame').innerHTML = this.frames;
+  document.getElementById('m-fps').innerHTML = this.fps;
 
   player.collision = {
         center: {
@@ -623,47 +732,130 @@ engine.update = function(delta) {
  * The second part of main loop.
  * Clean up entire canvas before actually drawing this frame.
  */
-engine.cleanup = function() {
-  engine.canvas.context.clearRect(0, 0, engine.canvas.width, engine.canvas.height);
+engine.cleanup = function(target) {
+  target.clearRect(0, 0, canvas.width, canvas.height);
 };
 
 /**
  * The third part of main loop.
  * Invoke .render() method of all instances.
  */
-engine.render = function() {
+engine.render = function(target) {
 
-  map.render(engine.canvas.context);
+  map.render(target);
 
   enemies.forEach((value) => {
-    value.render(engine.canvas.context);
+    value.render(target);
   });
-  player.render(engine.canvas.context);
+  player.render(target);
 };
 
-/**
- * Start the engine.
- */
-engine.run();
+
 
 /**
  * Handling events.
  */
+
+ // Document ready.
+(() => {
+  engine.run();
+
+  viewport.show(0.5);
+  canvas.show(1, 1);
+
+  panel.appendTo('viewport');
+  btnPause.appendTo('viewport')
+  btnStart.appendTo('panel');
+  optChar1.appendTo('panel');
+  optChar2.appendTo('panel');
+  optChar3.appendTo('panel');
+  optChar4.appendTo('panel');
+  optChar5.appendTo('panel');
+  panelMsg.appendTo('panel');
+
+  // Hide player character before game start.
+  player.pos.x = player.dest.x = 200;
+  player.pos.y = player.dest.y = 650;
+
+  setTimeout(() => {
+    canvas.unfocus(0.5);
+    panel.show(0.5, 0.5);
+    panelMsg.show(0.5, 1);
+    btnStart.show(0.5, 1.5);
+  }, 4000);
+})();
+
+// Character choose
+let elemChars = document.getElementsByClassName('sprite__char');
+for (let i = 0; i < elemChars.length; i++) {
+  elemChars[i].addEventListener('click', (event) => {
+    let strArray = String(event.target.src).split('/');
+    let fileName = strArray[strArray.length - 1];
+    let msg;
+    playerCharacter = `./images/${fileName}`;
+    switch (fileName) {
+      case 'char-boy.png':
+        msg = 'You\'ve chosen Boy!';
+        break;
+      case 'char-cat-girl.png':
+        msg = 'You\'ve chosen Cat Girl!';
+        break;
+      case 'char-horn-girl.png':
+        msg = 'You\'ve chosen Horn Girl!';
+        break;
+      case 'char-pink-girl.png':
+        msg = 'You\'ve chosen Pink Girl!';
+        break;
+      case 'char-princess-girl.png':
+        msg = 'You\'ve chosen Princess Girl!';
+        break;
+    }
+    panelMsg.text(msg);
+  });
+}
+
+document.getElementById('btn-start').addEventListener('click', (event) => {
+  engine.init();
+  panel.hide(0.5);
+  canvas.focus(0.5, 0.5);
+  btnPause.show(0.5, 0.5)
+  engine.resume();
+  event.preventDefault();
+});
+
+document.getElementById('btn-pause').addEventListener('click', (event) => {
+  if (engine.state) {
+    engine.pause();
+  } else {
+    engine.resume();
+  }
+
+  event.preventDefault();
+});
+
+
 document.addEventListener('keydown', (event) => {
   player.react(event);
 });
 
 document.addEventListener('break', (event) => {
   player.react(event);
-  sound.react(event);
   switch(event.detail) {
     case 'reach':
       engine.pause();
+      canvas.unfocus(0.5);
+      panel.show(0.5, 0.5);
+      btnPause.hide(0.1);
+      audio.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
+      break;
+    case 'collide':
+      audio.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
   }
 });
 
-// setTimeout(() => {engine.pause()}, 4000);
 
+
+// setTimeout(() => {engine.pause()}, 4000);
 // setTimeout(() => {engine.pause()}, 2000);
 
 
