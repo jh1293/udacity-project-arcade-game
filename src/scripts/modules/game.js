@@ -21,25 +21,18 @@ let optChar4 = new GUI.Sprite(90, 120, 101, 170, 'sprite__char', 'char-4', './im
 let optChar5 = new GUI.Sprite(210, 120, 101, 170, 'sprite__char', 'char-5', './images/char-princess-girl.png');
 let panelMsg = new GUI.Textbox(0, 300, 400, 50, 'panel__msg', 'msg', 'Choose Your Character');
 let audio = new Audio();  // Sound system
+let map = new Map();  // Map
 let player = new Entities.Player();  // Player entity
 let enemies = [];
 for (let i = 0; i < 8; i++) {
   let enemy = new Entities.Enemy();  // Enemy entities
   enemies.push(enemy);
 }
-let map = new Map();  // Map
 
 /**
  * Global variables.
  */
 let playerCharacter = null;
-
-/**
- * Building scene tree.
- * Being the first step of all creations.
- */
-// viewport.appendTo('game');
-// canvas.appendTo('viewport');
 
 /**
  * Bind engine to the canvas.
@@ -143,6 +136,10 @@ engine.render = function(target) {
  // Document ready.
 (() => {
 
+  /**
+   * Building scene tree.
+   * Being the first step of all creations.
+   */
   viewport.appendTo('game');
   canvas.appendTo('viewport');
 
@@ -262,8 +259,3 @@ document.addEventListener('break', (event) => {
       break;
     }
 });
-
-
-
-// setTimeout(() => {engine.pause()}, 4000);
-// setTimeout(() => {engine.pause()}, 2000);

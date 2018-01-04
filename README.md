@@ -2,64 +2,22 @@
 
 ## Overview
 
+This is just another student project based on web technology, and it means nothing other than me fiddling with codes. Hopefully one day I'll make something useful with all the knowledge I've learnt today.
+
 ## How to Play
 
-You can find live demo of this game [Here]().
+>You can find live demo of this game [Here](https://jh1293.github.io/arcade-game-demo/index.html).
 
-## Build
+1. Open the demo page above.
 
-1. Clone
+2. Wait until character selector shows.
 
-2. Build
+3. Select your favorite character, then click **Start**.
 
-3. Test Run
+4. Move your character by using arrow keys on your keyboard, _Up_, _Donw_, _Left_, and _Right_.
 
-4. Pack
+5. Safely reach the river, and **Beware the bugs**!
 
-## Structure
+## Future Plans
 
-Here is an abstraction of how this project's source codes and resources been organized.
-
-```
-/src
-    /audio
-    /images
-    /scripts
-        /libs
-        /modules
-        app.js
-    /styles
-        /frameworks
-        /scss
-        app.css
-    index.html
-```
-
-- src
-  Root folder containing all the source code and resources, along with third-party CSS frameworks and JavaScript libraries.
-
-  - audio
-
-  - images
-
-  - scripts
-
-    - libs
-
-    - modules
-
-    - app.js
-
-  - styles
-
-    - frameworks
-
-    - scss
-
-    - app.css
-
-  - index.html
-
-## Concept
-
-## Class References
+While creating this project, I discovered the beauty of modular design pattern, and I'll start making something really handy based on that concept.

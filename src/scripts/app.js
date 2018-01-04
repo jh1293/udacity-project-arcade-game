@@ -873,13 +873,13 @@ let optChar4 = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Sprite"](90, 120, 101,
 let optChar5 = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Sprite"](210, 120, 101, 170, 'sprite__char', 'char-5', './images/char-princess-girl.png');
 let panelMsg = new __WEBPACK_IMPORTED_MODULE_2__gui_js__["Textbox"](0, 300, 400, 50, 'panel__msg', 'msg', 'Choose Your Character');
 let audio = new __WEBPACK_IMPORTED_MODULE_3__audio_js__["default"]();  // Sound system
+let map = new __WEBPACK_IMPORTED_MODULE_5__map_js__["default"]();  // Map
 let player = new __WEBPACK_IMPORTED_MODULE_4__entities_js__["Player"]();  // Player entity
 let enemies = [];
 for (let i = 0; i < 8; i++) {
   let enemy = new __WEBPACK_IMPORTED_MODULE_4__entities_js__["Enemy"]();  // Enemy entities
   enemies.push(enemy);
 }
-let map = new __WEBPACK_IMPORTED_MODULE_5__map_js__["default"]();  // Map
 
 /**
  * Global variables.
@@ -1114,11 +1114,6 @@ document.addEventListener('break', (event) => {
       break;
     }
 });
-
-
-
-// setTimeout(() => {engine.pause()}, 4000);
-// setTimeout(() => {engine.pause()}, 2000);
 
 
 /***/ })
