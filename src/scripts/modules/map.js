@@ -1,16 +1,29 @@
-import Resources from './resources.js';
+/** @module modules/map */
 
+import Resources from './resources.js';
 let resources = new Resources();
 
+/** Class representing map. */
 export default class Map {
+  /**
+   * Create display list used for generating the map.
+   */
   constructor() {
     this.displayList = {};
   }
 
+  /**
+   * Get the tileset of current map.
+   * @return {object} Tileset of current map, aka. display list.
+   */
   get tileSet() {
     return this.displayList;
   }
 
+  /**
+   * Set the tileset of current map.
+   * @param {string} tileSet - URL of a json file contains the tileset information.
+   */
   set tileSet(tileSet) {
     let thisArg = this;
     let request = new XMLHttpRequest();
@@ -27,6 +40,10 @@ export default class Map {
     }
   }
 
+  /**
+   * Render map based on tileset.
+   * @param {object} context - Target canvas 2d context.
+   */
   render(context) {
     for (let index in this.displayList) {
       let image = this.displayList[index].image;

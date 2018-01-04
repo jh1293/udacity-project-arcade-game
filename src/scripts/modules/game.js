@@ -1,7 +1,6 @@
 import Engine from './engine.js';
 import Resources from './resources.js';
 import * as GUI from './gui.js';
-// import Input from './input.js';
 import Audio from './audio.js';
 import * as Entities from './entities.js';
 import Map from './map.js';
@@ -20,7 +19,7 @@ let optChar2 = new GUI.Sprite(150, 0, 101, 170, 'sprite__char', 'char-2', './ima
 let optChar3 = new GUI.Sprite(270, 0, 101, 170, 'sprite__char', 'char-3', './images/char-horn-girl.png');
 let optChar4 = new GUI.Sprite(90, 120, 101, 170, 'sprite__char', 'char-4', './images/char-pink-girl.png');
 let optChar5 = new GUI.Sprite(210, 120, 101, 170, 'sprite__char', 'char-5', './images/char-princess-girl.png');
-let panelMsg = new GUI.Textbox(0, 300, 400, 50, 'panel__msg', 'msg');
+let panelMsg = new GUI.Textbox(0, 300, 400, 50, 'panel__msg', 'msg', 'Choose Your Character');
 let audio = new Audio();  // Sound system
 let player = new Entities.Player();  // Player entity
 let enemies = [];
@@ -39,8 +38,8 @@ let playerCharacter = null;
  * Building scene tree.
  * Being the first step of all creations.
  */
-viewport.appendTo('game');
-canvas.appendTo('viewport');
+// viewport.appendTo('game');
+// canvas.appendTo('viewport');
 
 /**
  * Bind engine to the canvas.
@@ -62,12 +61,12 @@ engine.init = function() {
     './audio/win4.wav'
   ];
 
-  player.spriter = playerCharacter || './images/char-boy.png';
+  player.sprite = playerCharacter || './images/char-boy.png';
   player.pos.x = player.dest.x = 200;
   player.pos.y = player.dest.y = 450;
 
   enemies.forEach((value, index) => {
-    value.spriter = './images/enemy-bug.png';
+    value.sprite = './images/enemy-bug.png';
     value.pos.x = ((Math.random() * 3) + 1) * (-200);  // Keep cars away as the game starts
     if (index % 4 === 0) {  // For each line of stone, there are two cars running
       enemies[index].pos.y = 50;
@@ -143,6 +142,10 @@ engine.render = function(target) {
 
  // Document ready.
 (() => {
+
+  viewport.appendTo('game');
+  canvas.appendTo('viewport');
+
   engine.run();
 
   viewport.show(0.5);
@@ -214,17 +217,32 @@ document.getElementById('btn-pause').addEventListener('click', (event) => {
   } else {
     engine.resume();
   }
-
   event.preventDefault();
 });
 
 
 document.addEventListener('keydown', (event) => {
-  player.react(event);
+  switch (event.key) {
+    case 'Up':
+    case 'ArrowUp':
+      player.shift('up');
+      break;
+    case 'Down':
+    case 'ArrowDown':
+      player.shift('down');
+      break;
+    case 'Left':
+    case 'ArrowLeft':
+      player.shift('left');
+      break;
+    case 'Right':
+    case 'ArrowRight':
+      player.shift('right');
+      break;
+  }
 });
 
 document.addEventListener('break', (event) => {
-  player.react(event);
   switch(event.detail) {
     case 'reach':
       engine.pause();
@@ -234,8 +252,15 @@ document.addEventListener('break', (event) => {
       audio.play(`./audio/win${Math.floor(Math.random() * 4) + 1}.wav`);
       break;
     case 'collide':
+    console.log('collide');
+      engine.collisionCheckEnabled = false;  // Avoid collision events overlapping.
+      player.reset();
       audio.play(`./audio/hit${Math.floor(Math.random() * 2) + 1}.wav`);
-  }
+      setTimeout(() => {
+        engine.collisionCheckEnabled = true;
+      }, player.interval * 1000);
+      break;
+    }
 });
 
 
